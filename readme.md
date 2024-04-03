@@ -2,7 +2,7 @@
 Description
 
 
-## Comment ça Marche
+## Site
 1- /: Dashboard
 ...
 7- *: Page d'erreur 404 pour les routes non définies.
@@ -24,43 +24,16 @@ mettre à jours les dépendances : ```npm install```
 lancer le site : ```npm start```
 
 
-## BDD
-+-----------+          +----------+
-|   User    |          | Customer |
-+-----------+          +----------+
-| id        |          | id       |
-| name      |          | name     |
-| email     |          | socity   |
-| password  |          | adress   |
-+-----------+          | cp       |
-        |              | phone    |
-        |              +----------+
-        |                    |
-        |                    |
-        |                    |
-        |                    |
-+---------------+         +------------+       +------------+
-|  Order        |---------|  Material  |       |  Service   |
-+---------------+         +------------+       +------------+
-| id            |         | id         |       | id         |
-| devis_number  |         | nom        |       | nom        |
-| creation_date |         | cout       |       | cout       |
-| update_date   |         +------------+       +------------+
-| statut        |         |            |       |            |
-| cost          |         |            |       |            |
-| days          |         |            |       |            |
-| type_of_work  |         |            |       |            |
-| description   |         |            |       |            |
-+---------------+         +------------+       +------------+
-        |                    |                    |
-        |                    |                    |
-        |                    |                    |
-        |                    |                    |
-+----------------------+  +-----------------------+
-|   Material_Order     |  |    Service_Order      |
-+----------------------+  +-----------------------+
-| id                   |  | id                    |
-| order_id             |  | order_id              |
-| material_id          |  | service_id            |
-| quantity             |  | quantity              |
-+----------------------+  +-----------------------+
+## BDD - MLD
+User: id, email, password, name_socity, name, phone, adress, cp, city, country
+Customer: id, name_socity, name, phone, adress, cp, city, country
+Order: id, devis_number, start_date, creation_date, update_date, days, tva, statut, cost, type_of_work, description, customer_id, user_id
+Material: id, name, cost
+Services: id, name, cost
+Material_Order: id, order_id, material_id, quantity
+Service_Order: id, order_id, service_id, quantity
+
+## API
+1- /: Dashboard
+...
+7- *: Page d'erreur 404 pour les routes non définies.
