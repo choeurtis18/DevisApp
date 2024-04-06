@@ -53,8 +53,8 @@ export default function Navbar() {
           <NavLink to="/" className={getNavLinkClass("/")}>
             <i className="uil uil-create-dashboard"></i>Dashboard
           </NavLink>
-          <NavLink to="/commandes" className={getNavLinkClass("/commandes")}>
-            <i className="uil uil-list-ul"></i>Commande
+          <NavLink to="/orders" className={getNavLinkClass("/orders")}>
+            <i className="uil uil-list-ul"></i>Commandes
           </NavLink>
           <NavLink to="/client" className={getNavLinkClass("/client")}>
             <i className="uil uil-users-alt"></i>Client

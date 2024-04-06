@@ -5,7 +5,7 @@ import './index.css';
 import Navbar from "./pages/Navbar";
 import Login from "./pages/user/Login";
 import Home from "./pages/Home";
-import Commande from "./pages/commande/Commande";
+import Order from "./pages/order/Order";
 import NoPage from "./pages/NoPage";
 
 import PrivateRoute from "./components/PrivateRoute";
@@ -20,7 +20,7 @@ export default function App() {
         <Route element={<PrivateRoute />}>
           <Route path="/" element={<Navbar />}>
           <Route index element={<Home />} />
-          <Route path="/commandes" element={<Commande />} />
+          <Route path="/orders" element={<Order />} />
         </Route>
         </Route>
       </Routes>
