@@ -68,7 +68,7 @@ router.post('/signup', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   try {
-    const result = await loginController.login(req.body);
+    const result = await userController.login(req.body);
     res.status(result.status).json(result);
   } catch (error) {
     res.status(error.status || 500).json({ error: error.message });

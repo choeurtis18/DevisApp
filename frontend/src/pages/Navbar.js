@@ -26,15 +26,14 @@ export default function Navbar() {
 
         <div className="flex h-16 shrink-0 items-center gap-2 font-bold">
           <img className="h-8 w-auto" src="" alt="Electri Pro logo" />
-          Electri Pro logo
         </div>
       </div>
 
       {/* Sidebar Menu */}
       <nav
-        className={`${
+        className={`navbar ${
           isMenuOpen ? "translate-x-0" : "-translate-x-full"
-        } transform md:translate-x-0 transition-transform duration-300 ease-in-out md:flex flex-col gap-y-6 overflow-y-auto bg-[#E6E9F4] px-6 min-w-80 lg:min-w-60 md:min-w-60 lg:relative md:relative fixed inset-y-0 left-0 z-50`}
+        } transform md:translate-x-0 transition-transform duration-300 ease-in-out md:flex flex-col gap-y-6 overflow-y-auto bg-[#E6E9F4] px-6 min-w-80 lg:min-w-40 md:min-w-40 lg:relative md:relative fixed inset-y-0 left-0 z-50`}
       >
         {/* Close Menu Button */}
         <div className="flex flex-row gap-2 mt-8 mb-4">
@@ -47,7 +46,6 @@ export default function Navbar() {
 
           <NavLink to="/" className="flex h-16  shrink-0 items-center gap-4 font-bold text-2xl">
             <img className="h-14 w-auto" src="" alt="Electri Pro logo" />
-            Electri Pro
           </NavLink>          
         </div>
 
