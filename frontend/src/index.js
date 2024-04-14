@@ -5,6 +5,7 @@ import './index.css';
 import Navbar from "./pages/Navbar";
 import Login from "./pages/user/Login";
 import Home from "./pages/Home";
+import Orders from "./pages/order/Orders";
 import Order from "./pages/order/Order";
 import NoPage from "./pages/NoPage";
 
@@ -20,7 +21,8 @@ export default function App() {
         <Route element={<PrivateRoute />}>
           <Route path="/" element={<Navbar />}>
           <Route index element={<Home />} />
-          <Route path="/orders" element={<Order />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/order/:orderId" element={<Order />} />
         </Route>
         </Route>
       </Routes>

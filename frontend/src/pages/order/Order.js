@@ -1,111 +1,88 @@
-import { useState } from 'react';
-import useGetOrders from '../../hooks/order/useGetOrders';
-import useDeleteOrder from '../../hooks/order/useDeleteOrder';
+// src/page/order/OrderDetails.js
 
-import Notification from '../../components/Notification';
+import React from 'react';
+import {useParams} from "react-router-dom";
 
-const Orders = () => {
-    const { orders, isLoading, errorGetAllOrder } = useGetOrders();
-    const { deleteOrder, isDeleting, errorDeleteOrder } = useDeleteOrder();
-    const [searchTerm, setSearchTerm] = useState('');
-    const [showNotification, setShowNotification] = useState(false);
-    var notification_message = "ccc";
+import useGetOrder from '../../hooks/order/useGetOrder';
+import useGetCustomer from '../../hooks/customer/useGetCustomer';
+import useGetOrderMaterials from '../../hooks/order/useGetOrderMaterials';
+import useGetOrderServices from '../../hooks/order/useGetOrderServices';
+import DateFormat from '../../components/DateFormat';
 
-    if (isLoading) return <div>Loading...</div>;
-    if (errorGetAllOrder) return <div>Error: {errorGetAllOrder}</div>;
+const Order = () => {
+    const {orderId} = useParams();
+    const { order, isLoadingOrder, errorOrder } = useGetOrder(orderId);
+    const { customer, isLoadingCustomer, errorCustomer } = useGetCustomer(order?.customer_id);
+    const { materials, isLoading: isLoadingMaterials, error: errorMaterials } = useGetOrderMaterials(orderId);
+    const { services, isLoading: isLoadingServices, error: errorServices } = useGetOrderServices(orderId);
 
-    if (isDeleting) return <div>Loading...</div>;
-    if (errorDeleteOrder) return <div>Error: {errorDeleteOrder}</div>;
-
-    const formatDate = (isoDateString) => {
-        const date = new Date(isoDateString);
-        const day = date.getDate().toString().padStart(2, '0');
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}/${month}/${year}`;
-    };
-
-    const handleSearchChange = (event) => {
-        setSearchTerm(event.target.value);
-    };
-
-    const sortedAndFilteredOrders = orders.filter(order =>
-        order.devis_number.toString().includes(searchTerm) ||
-        (order.customer && order.customer.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    )
-
-    const handleDelete = async (orderId) => {
-        const isSuccess = await deleteOrder(orderId);
-        if (isSuccess) {
-            triggerNotification();
-            notification_message="la commande a bien été supprimé"
-        }
-    };
-
-    const triggerNotification = () => {
-        notification_message="la commande a bien été supprimé"
-
-        setShowNotification(true);
-    
-        setTimeout(() => {
-          setShowNotification(false);
-        }, 3000);
-    };
-
+    if (isLoadingOrder || isLoadingCustomer || isLoadingMaterials || isLoadingServices) return <div>Loading...</div>;
+    if (!order) return <div>Order not found</div>;
+    if (!customer) return <div>Customer not found</div>;
+    if (errorOrder) return <div>Error: {errorOrder}</div>;
+    if (errorCustomer) return <div>Error: {errorCustomer}</div>;
+    if (errorMaterials || errorServices) return <div>Error loading order details</div>;
+  
     return (
         <>
-            <Notification show={showNotification} message={notification_message} onClose={() => setShowNotification(false)} />
-
-            <div className="flex justify-between">
-                <h1 className="text-lg lg:text-2xl md:text-2xl font-bold underline">Mes devis</h1> 
-                <a href="/orders/add" className="text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-xs px-5 py-2.5">Ajouter un devis</a>
-            </div>       
-
-            <div className="pt-2 relative mx-auto text-gray-600">
-                <input
-                    className="border-2 border-gray-300 bg-white h-10 w-full px-5 rounded-lg text-sm focus:outline-none"
-                    type="search"
-                    placeholder="Rechercher par numéro de devis ou client"
-                    onChange={handleSearchChange}
-                />
+        <div className="flex justify-between">
+            <h1 className="text-lg lg:text-2xl md:text-2xl font-bold">
+            Commande DE{order.devis_number}
+            </h1> 
+            <a href={"/order/update/"+order._id} className="text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-xs px-5 py-2.5">
+            Modifier
+            </a>
+        </div>  
+        
+        <div className='customer-infos my-8 p-4 rounded overflow-hidden shadow-lg'>
+            <h3 className="text-md lg:text-xl md:text-xl font-bold">
+            Information du client
+            </h3> 
+            <div className='flex flex-col'>
+                <p>Facture à l’attention de : {customer.name_socity}</p>
+                <p className='font-bold'>Adresse du client</p>
+                <p>{customer.adress}</p>
+                <p>{customer.cp} {customer.city}, {customer.country}</p>
             </div>
+        </div>
 
-            <div className="overflow-x-auto shadow-md sm:rounded-lg my-8">
-                <table className="w-full text-sm text-left text-gray-500">
-                    <thead className="text-xs text-gray-700 uppercase bg-gray-100">
-                        <tr>
-                            <th className="px-6 py-3">Numero de devis</th>
-                            <th className="px-6 py-3">Date de création</th>
-                            <th className="px-6 py-3">Statut</th>
-                            <th className="px-6 py-3">Tarif</th>
-                            <th className="px-3 py-3"><span className="sr-only">Modifier</span></th>
-                            <th className="px-3 py-3"><span className="sr-only">Supprimer</span></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {sortedAndFilteredOrders.map((order, index) => (
-                            <tr key={index} className="bg-white border-b">
-                                <th className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">DE{order.devis_number}</th>
-                                <td className="px-6 py-4">{formatDate(order.creation_date)}</td>
-                                <td className="px-6 py-4">{order.statut}</td>
-                                <td className="px-6 py-4">{order.cost}</td>
-                                <td className="px-2 py-4">
-                                    <button onClick={() => triggerNotification()}
-                                        className="font-medium text-blue-600 hover:underline">Modifier
-                                    </button>
-                                </td>
-                                <td className="px-3 py-4 text-right">
-                                    <button onClick={() => handleDelete(order._id)} 
-                                        className="font-medium text-blue-600 hover:underline">Delete
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+        <div className='customer-infos my-8 p-4 rounded overflow-hidden shadow-lg'>
+            <h3 className="text-md lg:text-xl md:text-xl font-bold">
+            Information sur la prestation
+            </h3> 
+            <div className='flex flex-col'>
+                <p>Nature des travaux : {order.type_of_work}</p>
+                <p>Debut des travaux : <DateFormat value={order.creation_date} /></p>
+                <p>Durée des travaux : {order.days} jours</p>
+                <p>Prix total : {order.cost} €</p>
+                <p className='font-bold'>Description</p>
+                <p>{order.description}</p>
             </div>
+        </div>
+
+        <div className='customer-infos my-8 p-4 rounded overflow-hidden shadow-lg'>
+            <h3 className="text-md lg:text-xl md:text-xl font-bold">
+            Service réalisé
+            </h3> 
+            <div className='flex flex-col'>
+                {services.map(service => (
+                <li key={service._id}>{service.name} - Quantity: {service.quantity} - Cout: {service.cost}€</li>
+                ))}
+            </div>
+        </div>
+
+        <div className='customer-infos my-8 p-4 rounded overflow-hidden shadow-lg'>
+            <h3 className="text-md lg:text-xl md:text-xl font-bold">
+            Matériel utilisé
+            </h3> 
+            <div className='flex flex-col'>
+                {materials.map(material => (
+                <li key={material._id}>{material.name} - Quantity: {material.quantity} - Cout: {material.cost}€</li>
+                ))}
+            </div>
+        </div>
         </>
-    );
-};
+    )
+}
 
-export default Orders;
+export default Order;

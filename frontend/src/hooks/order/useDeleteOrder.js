@@ -19,9 +19,7 @@ const useDeleteOrder = () => {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Could not delete the order.');
       }
-
-      // Vous pouvez choisir de retourner quelque chose ici, par exemple, le statut de réussite.
-      // Pour cet exemple, nous allons simplement retourner true.
+      
       return true;
     } catch (error) {
       setError(error.message);

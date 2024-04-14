@@ -59,7 +59,7 @@ router.delete('/:id', async (req, res) => {
 
 router.get('/:id/materials', async (req, res) => {
     try {
-        const result = await orderController.getMateriel(req.params.id);
+        const result = await orderController.getMaterial(req.params.id);
         res.status(result.status).json(result);
     } catch (error) {
         console.error("An error occurred while getting materials for the order", error);
