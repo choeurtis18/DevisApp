@@ -5,7 +5,7 @@ const auth = require('../middleware/auth');
 
 const orderController = require('../controllers/OrderController');
 
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     try {
         const result = await orderController.getAllOrder();
         res.status(result.status).json(result);
@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
     try {
         const orderData = req.body;
         const result = await orderController.createOrder(orderData);
@@ -26,7 +26,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
     try {
         const result = await orderController.getOneOrder(req.params.id);
         res.status(result.status).json(result);
@@ -36,7 +36,7 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
     try {
         const orderData = req.body;
         const result = await orderController.updateOrder(req.params.id, orderData);
@@ -47,7 +47,7 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
     try {
         const result = await orderController.deleteOrder(req.params.id);
         res.status(result.status).json(result);
@@ -57,7 +57,7 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
-router.get('/:id/materials', async (req, res) => {
+router.get('/:id/materials', auth, async (req, res) => {
     try {
         const result = await orderController.getMaterial(req.params.id);
         res.status(result.status).json(result);
@@ -67,7 +67,7 @@ router.get('/:id/materials', async (req, res) => {
     }
 });
 
-router.get('/:id/services', async (req, res) => {
+router.get('/:id/services', auth, async (req, res) => {
     try {
         const result = await orderController.getService(req.params.id);
         res.status(result.status).json(result);

@@ -10,7 +10,7 @@ const Orders = () => {
     const { deleteOrder, isDeleting, errorDeleteOrder } = useDeleteOrder();
     const [searchTerm, setSearchTerm] = useState('');
     const [showNotification, setShowNotification] = useState(false);
-    var notification_message = "ccc";
+    var notification_message = "";
 
     if (isLoading) return <div>Loading...</div>;
     if (errorGetAllOrder) return <div>Error: {errorGetAllOrder}</div>;

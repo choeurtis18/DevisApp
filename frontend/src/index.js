@@ -7,6 +7,7 @@ import Login from "./pages/user/Login";
 import Home from "./pages/Home";
 import Orders from "./pages/order/Orders";
 import Order from "./pages/order/Order";
+import UpdateOrder from "./pages/order/UpdateOrder";
 import NoPage from "./pages/NoPage";
 
 import PrivateRoute from "./components/PrivateRoute";
@@ -23,6 +24,7 @@ export default function App() {
           <Route index element={<Home />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/order/:orderId" element={<Order />} />
+          <Route path="/order/update/:orderId" element={<UpdateOrder />} />
         </Route>
         </Route>
       </Routes>

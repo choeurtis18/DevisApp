@@ -11,7 +11,14 @@ const useGetOrderMaterials = (orderId) => {
     const fetchMaterials = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(`http://localhost:3000/order/${orderId}/materials`);
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:3000/order/${orderId}/materials`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          }
+        });
         const data = await response.json();
 
         if (!response.ok) {

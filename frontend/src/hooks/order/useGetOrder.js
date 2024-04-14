@@ -12,13 +12,20 @@ const useGetOrder = (orderId) => {
       if (!orderId) return;
       setIsLoading(true);
       try {
-        const response = await fetch(`http://localhost:3000/order/${orderId}`);
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:3000/order/${orderId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
         const data = await response.json();
-        
+
         if (!response.ok) {
           throw new Error(data.message || 'An error occurred while fetching the order');
         }
-        
+
         setOrder(data.order);
       } catch (error) {
         setError(error.message);
@@ -28,7 +35,7 @@ const useGetOrder = (orderId) => {
     };
 
     fetchOrder();
-  }, [orderId]); // Exécuter ce hook chaque fois que l'ID de la commande change
+  }, [orderId]);
 
   return { order, isLoading, error };
 };

@@ -1,18 +1,19 @@
-// src/hooks/order/useGetOrderServices.js
+// src/hooks/customer/useGetCustomer.js
 
 import { useState, useEffect } from 'react';
 
-const useGetOrderServices = (orderId) => {
-  const [services, setServices] = useState([]);
+const useGetCustomers = (customerId) => {
+  const [customers, setCustomers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchServices = async () => {
-      setIsLoading(true);
+    const fetchCustomers = async () => {
+      setIsLoading(true);    
+      
       try {
         const token = localStorage.getItem('token'); 
-        const response = await fetch(`http://localhost:3000/order/${orderId}/services`, {
+        const response = await fetch('http://localhost:3000/customer', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -22,10 +23,10 @@ const useGetOrderServices = (orderId) => {
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.message || 'An error occurred while fetching the services');
+          throw new Error(data.message || 'An error occurred while fetching orders');
         }
 
-        setServices(data.services);
+        setCustomers(data.customers);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -33,12 +34,10 @@ const useGetOrderServices = (orderId) => {
       }
     };
 
-    if (orderId) {
-      fetchServices();
-    }
-  }, [orderId]); 
+    fetchCustomers();
+  }, []);
 
-  return { services, isLoading, error };
+  return { customers, isLoading, error };
 };
 
-export default useGetOrderServices;
+export default useGetCustomers;

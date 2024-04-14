@@ -11,8 +11,12 @@ const useDeleteOrder = () => {
     setError(null);
 
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(`http://localhost:3000/order/${orderId}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
 
       if (!response.ok) {
@@ -20,10 +24,10 @@ const useDeleteOrder = () => {
         throw new Error(errorData.message || 'Could not delete the order.');
       }
       
-      return true;
+      return true; 
     } catch (error) {
       setError(error.message);
-      return false; // Indique que la suppression a échoué
+      return false;
     } finally {
       setIsDeleting(false);
     }

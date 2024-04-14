@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-const useGetOrderServices = (orderId) => {
+const useAddOrderServices = (orderId) => {
   const [services, setServices] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -41,4 +41,4 @@ const useGetOrderServices = (orderId) => {
   return { services, isLoading, error };
 };
 
-export default useGetOrderServices;
+export default useAddOrderServices;
