@@ -17,7 +17,7 @@ const DropdownGetCustomers = ({ initialCustomerId, onCustomerChange }) => {
 
     const handleChange = (event) => {
         setSelectedCustomerId(event.target.value);
-        onCustomerChange(event.target.value);  // Notify the parent component of the change
+        onCustomerChange(event.target.value); 
     };
 
     return (
@@ -32,7 +32,6 @@ const DropdownGetCustomers = ({ initialCustomerId, onCustomerChange }) => {
                         {customer.name_socity}
                     </option>
                 ))}
-                <option value="new" className="text-gray-700 block px-4 py-2 text-sm">Ajouter un nouveau</option>
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                 <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">

@@ -1,31 +1,28 @@
-// src/hooks/order/useUpdateOrder.js
+// src/hooks/material/useUpdateMaterial.js
 
 import { useState } from 'react';
 
-const useUpdateOrder = () => {
+const useUpdateMaterial = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const updateOrder = async (orderId, orderDetails, customerDetails) => {
+  const updateMaterial = async (materialId, materialDetails) => {
     setIsLoading(true);
-
-
-    orderDetails.customer_id = customerDetails._id;
 
     try {
       const token = localStorage.getItem('token'); 
-      const response = await fetch(`http://localhost:3000/order/${orderId}`, {
+      const response = await fetch(`http://localhost:3000/material/${materialId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ orderDetails })
+        body: JSON.stringify({ materialDetails })
       });
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'An error occurred while updating the order');
+        throw new Error(data.message || 'An error occurred while updating the material');
       }
 
       return true;
@@ -37,7 +34,7 @@ const useUpdateOrder = () => {
     }
   };
 
-  return { updateOrder, isLoading, error };
+  return { updateMaterial, isLoading, error };
 };
 
-export default useUpdateOrder;
+export default useUpdateMaterial;

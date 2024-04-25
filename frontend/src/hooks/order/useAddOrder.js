@@ -1,21 +1,17 @@
-// src/hooks/order/useUpdateOrder.js
-
 import { useState } from 'react';
 
-const useUpdateOrder = () => {
+const useAddOrder = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const updateOrder = async (orderId, orderDetails, customerDetails) => {
+  const addOrder = async (orderDetails) => {
     setIsLoading(true);
-
-
-    orderDetails.customer_id = customerDetails._id;
+    let result = false;
 
     try {
       const token = localStorage.getItem('token'); 
-      const response = await fetch(`http://localhost:3000/order/${orderId}`, {
-        method: 'PUT',
+      const response = await fetch(`http://localhost:3000/order`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -25,19 +21,19 @@ const useUpdateOrder = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'An error occurred while updating the order');
+        throw new Error(data.message || 'An error occurred while adding the order');
       }
-
-      return true;
+      result = { response: true, orderId: data.orderId }; 
     } catch (error) {
       setError(error.message);
-      return false;
+      result = false; 
     } finally {
       setIsLoading(false);
+      return result; 
     }
   };
 
-  return { updateOrder, isLoading, error };
+  return { addOrder, isLoading, error };
 };
 
-export default useUpdateOrder;
+export default useAddOrder;

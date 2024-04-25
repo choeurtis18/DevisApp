@@ -1,59 +1,55 @@
-// src/page/order/UpdateOrder.js
+// src/page/order/addOrder.js
 
 import React, { useState, useEffect } from 'react';
-import { useParams } from "react-router-dom";
 
-import useGetOrder from '../../hooks/order/useGetOrder';
-import useUpdateOrder from '../../hooks/order/useUpdateOrder';
-import useUpdateCustomer from '../../hooks/customer/useUpdateCustomer';
 import useGetCustomer from '../../hooks/customer/useGetCustomer';
-import useUpdateMaterial from '../../hooks/material/useUpdateMaterial';
-import useUpdateService from '../../hooks/service/useUpdateService';
+import useAddOrder from '../../hooks/order/useAddOrder';
 import useAddService from '../../hooks/service/useAddService';
 import useAddMaterial from '../../hooks/material/useAddMaterial';
 import DropdownGetCustomers from '../../components/DropdownGetCustomers';
-import useGetOrderServices from '../../hooks/order/useGetOrderServices';
-import useGetOrderMaterials from '../../hooks/order/useGetOrderMaterials';
 
 import Notification from '../../components/Notification';
-import useDeleteMaterial from '../../hooks/material/useDeleteMaterial';
-import useDeleteService from '../../hooks/service/useDeleteService';
 
-const UpdateOrder = () => {
-    const { orderId } = useParams();
-    const { order, isLoadingOrder, errorOrder } = useGetOrder(orderId);
-    const { updateOrder, isUpdatingOrder, errorUpdateOrder } = useUpdateOrder();
-    const { updateCustomer, isUpdatingCustomer, errorUpdateCustomer } = useUpdateCustomer();
-    const { updateMaterial, isUpdatingMaterial, errorUpdateMaterial } = useUpdateMaterial();
-    const { updateService, isUpdatingService, errorUpdateService } = useUpdateService();
-    const { addMaterial, isAddingMaterial, errorAddingMaterial } = useAddMaterial();
-    const { addService, isAddingService, errorAddingService } = useAddService();
-    const { deleteMaterial, isDeletingMaterial, errorDeletingMaterial } = useDeleteMaterial();
-    const { deleteService, isDeletingService, errorDeletingService } = useDeleteService();
+const AddOrder = () => {
 
     const [selectedCustomerId, setSelectedCustomerId] = useState('');
-    const [startDate, setStartDate] = useState("");
+    const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 16));
 
-    const { customer, isLoadingCustomer, errorCustomer } = useGetCustomer(selectedCustomerId);
-    const { services, isLoadingServices, errorGetAllServices } = useGetOrderServices(orderId);
-    const { materials, isLoadingMaterials, errorGetAllMaterials } = useGetOrderMaterials(orderId);
+    const { customer, isLoading: isLoadingCustomer } = useGetCustomer(selectedCustomerId);
+    const { addOrder, isLoading: isAddingOrder, error: errorAddOrder } = useAddOrder();
+    const { addMaterial, isLoading: isAddingMaterial, error: errorAddMaterial } = useAddMaterial();
+    const { addService, isLoading: isAddingService, error: errorAddService } = useAddService();
 
     const [localServices, setLocalServices] = useState([]);
     const [localMaterials, setLocalMaterials] = useState([]);
 
+    const [notificationMessage, setNotificationMessage] = useState("");
+    const [showNotification, setShowNotification] = useState(false);
+    const [notification, setNotification] = useState({ show: false, message: '' });
+
+
+    const triggerNotification = () => {
+        setShowNotification(true);
+        setTimeout(() => setShowNotification(false), 3000);
+    };
+
+    const handleCustomerChange = (customerId) => {
+        setSelectedCustomerId(customerId);
+    };
+
     const [orderDetails, setOrderDetails] = useState({
-        _id: '',
-        devis_number: '',
+        devis_number: Date.now(),
         start_date: '',
-        creation_date: '',
-        update_date: '',
+        creation_date: Date.now(),
+        update_date: Date.now(),
         days: '',
         tva: '',
-        statut: '',
+        statut: "en cours",
         cost: '',
         type_of_work: '',
         description: '',
-        user_id: '',
+        user_id: localStorage.getItem('userId'),
+        customer_id: ''
     });
 
     const [customerDetails, setCustomerDetails] = useState({
@@ -68,11 +64,7 @@ const UpdateOrder = () => {
     });
 
     useEffect(() => {
-        if (services) setLocalServices(services);
-        if (materials) setLocalMaterials(materials);
         if (customer) {
-            setSelectedCustomerId(selectedCustomerId);
-
             setCustomerDetails({
                 _id: customer._id || '',
                 name: customer.name || '',
@@ -84,122 +76,63 @@ const UpdateOrder = () => {
                 country: customer.country || '',
             });
         }
-        if (order) {
-            setSelectedCustomerId(order.customer_id);
-            setStartDate(formatDateForInput(order.start_date));
+    }, [customer]); 
 
-            setOrderDetails({
-                _id: order._id || '',
-                devis_number: order.devis_number || '',
-                start_date: order.start_date || '',
-                creation_date: order.creation_date || '',
-                update_date: order.update_date || '',
-                days: order.days || '',
-                tva: order.tva || 0, 
-                statut: order.statut || '',
-                cost: order.cost || '',
-                type_of_work: order.type_of_work || '',
-                description: order.description || '',
-                user_id: order.user_id || '',
-                customer_id: customerDetails._id || '',
-            });
-        }
-    }, [services, materials, order, customer]);
+    const handleUpdate = async (event) => {
+        event.preventDefault(); 
 
-    const formatDateForInput = (isoDate) => {
-        const date = new Date(isoDate);
-        return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
-    };
+        orderDetails.customer_id = customerDetails._id;
+        orderDetails.start_date = startDate;
 
-    const handleCustomerChange = (customerId) => {
-        setSelectedCustomerId(customerId);
-    };
+        let order_cost = 0;
+        localMaterials.map(material => {
+            order_cost += parseFloat(material.cost) * parseInt(material.quantity)
+        })
+        localServices.map(service => {
+            order_cost += parseFloat(service.cost) * parseInt(service.quantity)
+        })
+        orderDetails.cost = order_cost;
 
-    const [showNotification, setShowNotification] = useState(false);
-    const [notificationMessage, setNotificationMessage] = useState("");
-
-    if (isLoadingOrder || isLoadingCustomer || isDeletingMaterial || isDeletingService || isUpdatingOrder || isAddingService || isUpdatingService || isUpdatingCustomer || isAddingMaterial || isUpdatingMaterial  || isLoadingServices || isLoadingMaterials)
-        return <div>Loading...</div>;
-    if (errorOrder || errorCustomer || errorDeletingMaterial || errorDeletingService || errorUpdateOrder || errorAddingService || errorUpdateService || errorUpdateCustomer || errorUpdateMaterial || errorGetAllServices || errorGetAllMaterials) {
-        const errorMsg = errorOrder || errorCustomer || errorDeletingMaterial || errorDeletingService || errorUpdateOrder || errorAddingService || errorUpdateService || errorUpdateCustomer || errorUpdateMaterial || errorGetAllServices || errorGetAllMaterials;
-        return <div>Error: {errorMsg}</div>;
-    }
-    if (!order || !customer || !services || !materials)
-        return <div>Order or Customer or Service or Materials not found</div>;
-
-    const handleUpdate = async () => {
-        orderDetails.statut = startDate;
-        const isSuccessOrder = await updateOrder(orderDetails._id, orderDetails, customerDetails);
-        const isSuccessCustomer = await updateCustomer(customerDetails._id, customerDetails);
+        const isSuccessOrder = await addOrder(orderDetails);
 
         try {
-            const results = await Promise.all(localMaterials.map(async element => {
-                const existingMaterial = materials.find(material => material._id === element._id);
-                if (existingMaterial) {
-                    return await updateMaterial(element._id, element);
-                } else {
-                    return await addMaterial(element, order._id);
-                }
+            await Promise.all(localMaterials.map(async element => {
+                return await addMaterial(element, isSuccessOrder.orderId);
             }));
         } catch (error) {
-            console.error("Erreur lors de la mise à jour des matériaux/services:", error);
+            setNotificationMessage("Erreur lors de l'ajout de materiel");
+            triggerNotification();
+            console.error("Erreur lors de l'ajout de materiel", error);
         }
 
         try {
-            await Promise.all(materials.map(async element => {
-                const existingMaterial = localMaterials.find(material => material._id === element._id);
-                if (!existingMaterial) {
-                    return await deleteMaterial(element._id);
-                }
-            }));    
-        } catch (error) {
-            console.error("Erreur lors de la mise à jour des matériaux/services:", error);
-        }
-
-
-        try {
-            const results = await Promise.all(localServices.map(async element => {
-                const existingService = services.find(service => service._id === element._id);
-                if (existingService) {
-                    return await updateService(element._id, element);
-                } else {
-                    return await addService(element, order._id);
-                }
+            await Promise.all(localServices.map(async element => {
+                return await addService(element, isSuccessOrder.orderId);
             }));
-    
         } catch (error) {
-            console.error("Erreur lors de la mise à jour des matériaux/services:", error);
-        }
-
-        try {
-            await Promise.all(services.map(async element => {
-                const existingService = localServices.find(service => service._id === element._id);
-                if (!existingService) {
-                    return await deleteService(element._id);
-                }
-            }));    
-        } catch (error) {
-            console.error("Erreur lors de la mise à jour des matériaux/services:", error);
+            setNotificationMessage("Erreur lors de l'ajout de services");
+            triggerNotification();
+            console.error("Erreur lors de l'ajout de service", error);
         }
        
-        if (isSuccessOrder, isSuccessCustomer) {
-            setNotificationMessage("La commande a bien été mise à jour.");
+        if (isSuccessOrder.response) {
+            setNotificationMessage("La commande a bien été ajouté.");
             triggerNotification();
         }
     };
 
-    const triggerNotification = () => {
-        setShowNotification(true);
-        setTimeout(() => setShowNotification(false), 3000);
+    if (isLoadingCustomer || isAddingOrder || isAddingMaterial || isAddingService) {
+        return <div>Loading...</div>;
+    }
+
+    if (errorAddOrder || errorAddMaterial || errorAddService) {
+        return <div>Error: {errorAddOrder || errorAddMaterial || errorAddService}</div>;
+    }
+
+    const handleNotificationClose = () => {
+        setNotification({ show: false, message: '' });
     };
 
-    const handleStartDateChange = (event) => {
-        setStartDate(event.target.value);
-    };
-
-    const handleCustomerDetailsChange = (field, value) => {
-        setCustomerDetails(prev => ({ ...prev, [field]: value }));
-    };
     const handleOrderDetailsChange = (field, value) => {
         const newValue = field === 'tva' ? parseFloat(value) || 0 : value;
         setOrderDetails(prev => ({ ...prev, [field]: newValue }));
@@ -226,15 +159,19 @@ const UpdateOrder = () => {
     };
 
     return (
-        <>
+        <form onSubmit={handleUpdate}>
             <Notification show={showNotification} message={notificationMessage} onClose={() => setShowNotification(false)} />
+
+            {notification.show && (
+                <Notification message={notification.message} onClose={handleNotificationClose} />
+            )}
 
             <div className="flex justify-between">
                 <h1 className="text-lg lg:text-2xl md:text-2xl font-bold">
-                    Commande DE{order.devis_number}
+                    Commande DE
                 </h1> 
-                <button onClick={handleUpdate} 
-                    className="text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-xs px-5 py-2.5">Update
+                <button type="submit"
+                    className="text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-xs px-5 py-2.5">Ajouter
                 </button>
             </div>
 
@@ -261,25 +198,25 @@ const UpdateOrder = () => {
                     <tbody>
                         <tr className="bg-white border-b">
                             <td className="px-6 py-4">
-                                <input type='text' value={customerDetails.name} onChange={(e) => handleCustomerDetailsChange('name', e.target.value)} />
+                            {customerDetails.name}
                             </td>
                             <td className="px-6 py-4">
-                                <input type='text' value={customerDetails.name_socity} onChange={(e) => handleCustomerDetailsChange('name_socity', e.target.value)} />
+                            {customerDetails.name_socity}
                             </td>
                             <td className="px-6 py-4">
-                                <input type='text' value={customerDetails.phone} onChange={(e) => handleCustomerDetailsChange('phone', e.target.value)} />
+                            {customerDetails.phone}
                             </td>
                             <td className="px-6 py-4">
-                                <input type='text' value={customerDetails.adress} onChange={(e) => handleCustomerDetailsChange('adress', e.target.value)} />
+                            {customerDetails.adress}
                             </td>
                             <td className="px-6 py-4">
-                                <input type='number' value={customerDetails.cp} onChange={(e) => handleCustomerDetailsChange('cp', e.target.value)} />
+                            {customerDetails.cp}
                             </td>
                             <td className="px-6 py-4">
-                                <input type='text' value={customerDetails.city} onChange={(e) => handleCustomerDetailsChange('city', e.target.value)} />
+                            {customerDetails.city}
                             </td>
                             <td className="px-6 py-4">
-                                <input type='text' value={customerDetails.country} onChange={(e) => handleCustomerDetailsChange('country', e.target.value)} />
+                            {customerDetails.country}
                             </td>
                         </tr>
                     </tbody>
@@ -305,15 +242,15 @@ const UpdateOrder = () => {
                             TCHOUNGA
                             </td>
                             <td className="px-6 py-4">
-                                <input type='text' value={orderDetails.type_of_work} onChange={(e) => handleOrderDetailsChange('type_of_work', e.target.value)} />
+                                <input type='text' required="required" value={orderDetails.type_of_work} onChange={(e) => handleOrderDetailsChange('type_of_work', e.target.value)} />
                             </td>
                             <td className="px-6 py-4">
-                                <input type='datetime-local' value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+                                <input type='datetime-local' required="required" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
                             </td>
                             <td className="px-6 py-4">
                             </td>
                             <td className="px-6 py-4">
-                                <input type='number' value={orderDetails.days} onChange={(e) => handleOrderDetailsChange('days', e.target.value)} />
+                                <input type='number' required="required" value={orderDetails.days} onChange={(e) => handleOrderDetailsChange('days', e.target.value)} />
                             </td>
                             <td className="px-6 py-4">
                             PAYABLE A RECEPTION
@@ -339,9 +276,9 @@ const UpdateOrder = () => {
                     <tbody>
                         {localServices.map((service, index) => (
                             <tr key={service._id || index}>
-                                <td className="px-6 py-3"><input type="number" value={service.quantity} onChange={e => handleServiceChange(index, 'quantity', e.target.value)} /></td>
-                                <td className="px-6 py-3"><input type="text" value={service.name} onChange={e => handleServiceChange(index, 'name', e.target.value)} /></td>
-                                <td className="px-6 py-3"><input type="number" value={service.cost} onChange={e => handleServiceChange(index, 'cost', parseFloat(e.target.value))} /></td>
+                                <td className="px-6 py-3"><input required="required" type="number" onChange={e => handleServiceChange(index, 'quantity', e.target.value)} /></td>
+                                <td className="px-6 py-3"><input required="required" type="text" onChange={e => handleServiceChange(index, 'name', e.target.value)} /></td>
+                                <td className="px-6 py-3"><input required="required" type="number" onChange={e => handleServiceChange(index, 'cost', parseFloat(e.target.value))} /></td>
                                 <td className="px-6 py-3"></td>
                                 <td className="px-6 py-3">{service.quantity * service.cost}</td>
                                 <td className="px-6 py-3"><button onClick={() => setLocalServices(localServices.filter((_, i) => i !== index))}>Remove</button></td>
@@ -370,9 +307,9 @@ const UpdateOrder = () => {
                     <tbody>
                         {localMaterials.map((material, index) => (
                             <tr key={material._id || index}>
-                                <td className="px-6 py-3"><input type="number" value={material.quantity} onChange={e => handleMaterialChange(index, 'quantity', e.target.value)} /></td>
-                                <td className="px-6 py-3"><input type="text" value={material.name} onChange={e => handleMaterialChange(index, 'name', e.target.value)} /></td>
-                                <td className="px-6 py-3"><input type="number" value={material.cost} onChange={e => handleMaterialChange(index, 'cost', parseFloat(e.target.value))} /></td>
+                                <td className="px-6 py-3"><input required="required" type="number" onChange={e => handleMaterialChange(index, 'quantity', e.target.value)} /></td>
+                                <td className="px-6 py-3"><input required="required" type="text" onChange={e => handleMaterialChange(index, 'name', e.target.value)} /></td>
+                                <td className="px-6 py-3"><input required="required" type="number" onChange={e => handleMaterialChange(index, 'cost', parseFloat(e.target.value))} /></td>
                                 <td className="px-6 py-3"></td>
                                 <td className="px-6 py-3">{material.quantity * material.cost}</td>
                                 <td className="px-6 py-3"><button onClick={() => setLocalMaterials(localMaterials.filter((_, i) => i !== index))}>Remove</button></td>
@@ -398,20 +335,20 @@ const UpdateOrder = () => {
                     <tbody>
                         <tr className="bg-white border-b">
                             <td className="px-6 py-4">
-                                <textarea name='order_description' className="py-10 px-4" onChange={(e) => handleOrderDetailsChange('order_description', e.target.value)}>{orderDetails.description}</textarea>
+                                <textarea required="required" name='order_description' className="py-10 px-4" onChange={(e) => handleOrderDetailsChange('description', e.target.value)}></textarea>
                             </td>
                             <td className="px-6 py-4">
-                                <input type='number' value={orderDetails.tva} name="order_tva" onChange={(e) => handleOrderDetailsChange('tva', e.target.value)} />
+                                <input required="required" type='number' name="order_tva" onChange={(e) => handleOrderDetailsChange('tva', e.target.value)} />
                             </td>
                             <td className="px-6 py-4">
-                                {order.cost}
+                                {orderDetails.cost}
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-        </>
+        </form>
     );
 }
 
-export default UpdateOrder;
+export default AddOrder;

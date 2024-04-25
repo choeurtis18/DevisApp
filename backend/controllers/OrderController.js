@@ -8,7 +8,7 @@ exports.createOrder = async (orderData) => {
   try {
     const order = new Order(orderData);
     await order.save();
-    return { status: 201, message: 'Order saved successfully!' };
+    return { status: 201, message: 'Order saved successfully!',  orderId: order._id };
   } catch (error) {
     console.error("An error occurred while create the order:", error);
     throw error;

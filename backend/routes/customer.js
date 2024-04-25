@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-        const customerData = req.body;
+        const customerData = req.body.customerDetails;
         const result = await customerController.createCustomer(customerData);
         res.status(result.status).json(result);
     } catch (error) {
@@ -38,7 +38,7 @@ router.get('/:id', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
     try {
-        const customerData = req.body;
+        const customerData = req.body.customerDetails;
         const result = await customerController.updateCustomer(req.params.id, customerData);
         res.status(result.status).json(result);
     } catch (error) {
