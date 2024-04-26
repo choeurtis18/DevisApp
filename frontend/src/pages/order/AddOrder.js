@@ -156,13 +156,14 @@ const AddOrder = () => {
         }
     };
 
+    //Gestion des chargements et des erreurs
     if (isLoadingCustomer || isAddingOrder || isAddingMaterial || isAddingService)  return <div>Loading...</div>;
     if (errorAddOrder || errorAddMaterial || errorAddService) return <div>Error: {errorAddOrder || errorAddMaterial || errorAddService}</div>;
 
     return (
         <form onSubmit={handleUpdate}>
             <Notification show={showNotification} message={notificationMessage} onClose={() => setShowNotification(false)} />
-            <div className="flex justify-between">
+            <div className="flex justify-between mb-4">
                 <h1 className="text-lg lg:text-2xl md:text-2xl font-bold">Ajouter une commande</h1> 
                 <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-xs px-5 py-2.5">
                     Ajouter

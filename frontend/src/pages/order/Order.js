@@ -8,6 +8,10 @@ import useGetCustomer from '../../hooks/customer/useGetCustomer';
 import useGetOrderMaterials from '../../hooks/order/useGetOrderMaterials';
 import useGetOrderServices from '../../hooks/order/useGetOrderServices';
 import DateFormat from '../../components/DateFormat';
+import CustomerInfoTable from '../../components/order/CustomerInfoTable';
+import OrderInfoTable from '../../components/order/OrderInfoTable';
+import ServiceInfoTable from '../../components/order/ServiceInfoTable';
+import MaterialInfoTable from '../../components/order/MaterialInfoTable';
 
 const Order = () => {
     const {orderId} = useParams();
@@ -34,53 +38,10 @@ const Order = () => {
             </a>
         </div>  
         
-        <div className='customer-infos my-8 p-4 rounded overflow-hidden shadow-lg'>
-            <h3 className="text-md lg:text-xl md:text-xl font-bold">
-            Information du client
-            </h3> 
-            <div className='flex flex-col'>
-                <p>Facture à l’attention de : {customer.name_socity}</p>
-                <p className='font-bold'>Adresse du client</p>
-                <p>{customer.adress}</p>
-                <p>{customer.cp} {customer.city}, {customer.country}</p>
-            </div>
-        </div>
-
-        <div className='customer-infos my-8 p-4 rounded overflow-hidden shadow-lg'>
-            <h3 className="text-md lg:text-xl md:text-xl font-bold">
-            Information sur la prestation
-            </h3> 
-            <div className='flex flex-col'>
-                <p>Nature des travaux : {order.type_of_work}</p>
-                <p>Debut des travaux : <DateFormat value={order.creation_date} /></p>
-                <p>Durée des travaux : {order.days} jours</p>
-                <p>Prix total : {order.cost} €</p>
-                <p className='font-bold'>Description</p>
-                <p>{order.description}</p>
-            </div>
-        </div>
-
-        <div className='customer-infos my-8 p-4 rounded overflow-hidden shadow-lg'>
-            <h3 className="text-md lg:text-xl md:text-xl font-bold">
-            Service réalisé
-            </h3> 
-            <div className='flex flex-col'>
-                {services.map(service => (
-                <li key={service._id}>{service.name} - Quantity: {service.quantity} - Cout: {service.cost}€</li>
-                ))}
-            </div>
-        </div>
-
-        <div className='customer-infos my-8 p-4 rounded overflow-hidden shadow-lg'>
-            <h3 className="text-md lg:text-xl md:text-xl font-bold">
-            Matériel utilisé
-            </h3> 
-            <div className='flex flex-col'>
-                {materials.map(material => (
-                <li key={material._id}>{material.name} - Quantity: {material.quantity} - Cout: {material.cost}€</li>
-                ))}
-            </div>
-        </div>
+        <CustomerInfoTable customerDetails={customer} />
+        <OrderInfoTable orderDetails={order} startDate={order.start_date.slice(0, 16)}/>
+        <ServiceInfoTable localServices={services} />
+        <MaterialInfoTable localMaterials={materials} />
         </>
     )
 }

@@ -1,5 +1,5 @@
-// src/components/order/OrderDetailsForm.js
-const OrderDetailsForm = ({ orderDetails, handleOrderDetailsChange, startDate, setStartDate }) => { 
+// src/components/order/OrderInfoTable.js
+const OrderInfoTable = ({ orderDetails, startDate }) => { 
     return (
         <>
         {/* Global Info */}
@@ -21,15 +21,15 @@ const OrderDetailsForm = ({ orderDetails, handleOrderDetailsChange, startDate, s
                         TCHOUNGA
                         </td>
                         <td className="px-6 py-4">
-                            <input className="border border-gray-100 rounded-md" type='text' required="required" value={orderDetails.type_of_work} onChange={(e) => handleOrderDetailsChange('type_of_work', e.target.value)} />
+                            {orderDetails.type_of_work}
                         </td>
                         <td className="px-6 py-4">
-                            <input className="border border-gray-100 rounded-md" type='datetime-local' required="required" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+                            {startDate}
                         </td>
                         <td className="px-6 py-4">
                         </td>
                         <td className="px-6 py-4">
-                            <input className="border border-gray-100 rounded-md" type='number' required="required" value={orderDetails.days} onChange={(e) => handleOrderDetailsChange('days', e.target.value)} />
+                            {orderDetails.days}
                         </td>
                         <td className="px-6 py-4">
                         PAYABLE A RECEPTION
@@ -53,10 +53,10 @@ const OrderDetailsForm = ({ orderDetails, handleOrderDetailsChange, startDate, s
                 <tbody>
                     <tr className="bg-white border-b">
                         <td className="px-6 py-4">
-                            <textarea required="required" name='order_description' className="py-10 px-4" value={orderDetails.description} onChange={(e) => handleOrderDetailsChange('description', e.target.value)}></textarea>
+                            {orderDetails.description}
                         </td>
                         <td className="px-6 py-4">
-                            <input className="border border-gray-100 rounded-md" required="required" type='number' value={orderDetails.tva} name="order_tva" onChange={(e) => handleOrderDetailsChange('tva', e.target.value)} />
+                            {orderDetails.tva}
                         </td>
                         <td className="px-6 py-4">
                             {orderDetails.cost}
@@ -69,4 +69,4 @@ const OrderDetailsForm = ({ orderDetails, handleOrderDetailsChange, startDate, s
     );
 };
 
-export default OrderDetailsForm;
+export default OrderInfoTable;
