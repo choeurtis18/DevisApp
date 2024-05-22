@@ -1,9 +1,21 @@
 const Service = require('../models/Service');
+const ServiceOrders = require('../models/ServiceOrders');
 
 exports.createService = async (serviceData) => {
   try {
-    const service = new Service(serviceData);
+    const service = new Service(
+      {name: serviceData.serviceDetails.name, 
+        cost: serviceData.serviceDetails.cost, }
+    );
     await service.save();
+
+    const serviceOrder = new ServiceOrders(
+      {order_id: serviceData.orderId, 
+        service_id: service, 
+        quantity: serviceData.serviceDetails.quantity}
+    );
+    await serviceOrder.save();
+
     return { status: 201, message: 'Service saved successfully!' };
   } catch (error) {
     console.error("An error occurred while create the service:", error);

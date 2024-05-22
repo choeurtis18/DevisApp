@@ -1,14 +1,14 @@
 const Order = require('../models/Order');
 const MaterialOrders = require('../models/MaterialOrders');
-const Material = require('../controllers/MaterialController');
+const Material = require('../models/Material');
 const ServiceOrders = require('../models/ServiceOrders');
-const Service = require('../controllers/ServiceController');
+const Service = require('../models/Service');
 
 exports.createOrder = async (orderData) => {
   try {
     const order = new Order(orderData);
     await order.save();
-    return { status: 201, message: 'Order saved successfully!' };
+    return { status: 201, message: 'Order saved successfully!',  orderId: order._id };
   } catch (error) {
     console.error("An error occurred while create the order:", error);
     throw error;
@@ -64,50 +64,49 @@ exports.deleteOrder = async (id) => {
   }
 };
 
-exports.getMateriel = async (orderId) => {
+exports.getMaterial = async (orderId) => {
   try {
-    const order = await this.getOneOrder(orderId).order;
-    if (!order) throw new Error('Order not found.');
+    const order = await Order.findById(orderId);
+    if (!order) {
+      throw new Error('Order not found.');
+    }
 
     const materialsOrder = await MaterialOrders.find({ order_id: order._id });
     const materialIds = materialsOrder.map(mo => mo.material_id);
-    const materials = await Material.getOneMaterial(materialIds.random()).material;
 
-    if (materials) {
-      const materialsWithQuantity = materials.map(material => {
-        const found = materialsOrder.find(mo => String(mo.material_id) === String(material._id));
-        return { ...material.toObject(), quantity: found ? found.quantity : 0 };
-      });   
-      
-      return { status: 200, materials: materialsWithQuantity };
-    } else {
-      console.error("An error occurred while get materials in OrderController", error);
-    }
+    const materials = await Material.find({ _id: { $in: materialIds } });
+
+    const materialsWithQuantity = materials.map(material => {
+      const found = materialsOrder.find(mo => String(mo.material_id) === String(material._id));
+      return { ...material.toObject(), quantity: found ? found.quantity : 0 };
+    });
+
+    return { status: 200, materials: materialsWithQuantity };
   } catch (error) {
     console.error("An error occurred while getting materials for the order:", error);
     throw error;
   }
 };
 
+
 exports.getService = async (orderId) => {
   try {
-    const order = await this.getOneOrder(orderId).order;
-    if (!order) throw new Error('Order not found.');
+    const order = await Order.findById(orderId);
+    if (!order) {
+      throw new Error('Order not found.');
+    }
 
     const servicesOrder = await ServiceOrders.find({ order_id: order._id });
-    const serviceIds = servicesOrder.map(so => so.service_id);
-    const services = await Service.getOneService(serviceIds.random());
+    const serviceIds = servicesOrder.map(mo => mo.service_id);
 
-    if (services) {
-      const servicesWithQuantity = services.map(service => {
-        const found = servicesOrder.find(so => String(so.service_id) === String(service._id));
-        return { ...service.toObject(), quantity: found ? found.quantity : 0 };
-      });   
-      
-      return { status: 200, services: servicesWithQuantity };
-    } else {
-      console.error("An error occurred while get materials in OrderController", error);
-    }
+    const services = await Service.find({ _id: { $in: serviceIds } });
+
+    const servicesWithQuantity = services.map(service => {
+      const found = servicesOrder.find(mo => String(mo.service_id) === String(service._id));
+      return { ...service.toObject(), quantity: found ? found.quantity : 0 };
+    });
+
+    return { status: 200, services: servicesWithQuantity };
   } catch (error) {
     console.error("An error occurred while getting services for the order:", error);
     throw error;

@@ -1,9 +1,21 @@
 const Material = require('../models/Material');
+const MaterialOrders = require('../models/MaterialOrders');
 
 exports.createMaterial = async (materialData) => {
   try {
-    const material = new Material(materialData);
+    const material = new Material(
+      {name: materialData.materialDetails.name, 
+        cost: materialData.materialDetails.cost, }
+    );
     await material.save();
+
+    const materialOrder = new MaterialOrders(
+      {order_id: materialData.orderId, 
+        material_id: material, 
+        quantity: materialData.materialDetails.quantity}
+    );
+    await materialOrder.save();
+
     return { status: 201, message: 'Material saved successfully!' };
   } catch (error) {
     console.error("An error occurred while create the material:", error);

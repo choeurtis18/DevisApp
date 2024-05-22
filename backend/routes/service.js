@@ -38,7 +38,7 @@ router.get('/:id', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
     try {
-        const serviceData = req.body;
+        const serviceData = req.body.serviceDetails;
         const result = await serviceController.updateService(req.params.id, serviceData);
         res.status(result.status).json(result);
     } catch (error) {

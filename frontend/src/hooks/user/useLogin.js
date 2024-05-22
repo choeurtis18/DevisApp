@@ -20,6 +20,7 @@ const useLogin = () => {
 
       if (response.ok) {
         localStorage.setItem('token', data.data.token); 
+        localStorage.setItem('userId', data.data.userId); 
         navigate('/'); 
       } else {
         throw new Error(data.message || 'Une erreur est survenue lors de la connexion.');

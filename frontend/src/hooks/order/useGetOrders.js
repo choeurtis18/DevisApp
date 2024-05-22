@@ -1,19 +1,18 @@
-// src/hooks/order/useGetOrder.js
+// src/hooks/order/useGetOrders.js
 
 import { useState, useEffect } from 'react';
 
-const useGetOrder = (orderId) => {
-  const [order, setOrder] = useState(null);
+const useGetOrders = () => {
+  const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchOrder = async () => {
-      if (!orderId) return;
+    const fetchOrders = async () => {
       setIsLoading(true);
       try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:3000/order/${orderId}`, {
+        const token = localStorage.getItem('token'); 
+        const response = await fetch('http://localhost:3000/order', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -23,10 +22,10 @@ const useGetOrder = (orderId) => {
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.message || 'An error occurred while fetching the order');
+          throw new Error(data.message || 'An error occurred while fetching orders');
         }
 
-        setOrder(data.order);
+        setOrders(data.orders);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -34,10 +33,10 @@ const useGetOrder = (orderId) => {
       }
     };
 
-    fetchOrder();
-  }, [orderId]);
+    fetchOrders();
+  }, []); 
 
-  return { order, isLoading, error };
+  return { orders, isLoading, error };
 };
 
-export default useGetOrder;
+export default useGetOrders;

@@ -38,7 +38,7 @@ router.get('/:id', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
     try {
-        const materialData = req.body;
+        const materialData = req.body.materialDetails;
         const result = await materialController.updateMaterial(req.params.id, materialData);
         res.status(result.status).json(result);
     } catch (error) {
